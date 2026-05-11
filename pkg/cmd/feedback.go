@@ -62,7 +62,7 @@ var feedbackRecord = cli.Command{
 }
 
 func handleFeedbackRecord(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -80,7 +80,7 @@ func handleFeedbackRecord(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.FeedbackRecordParams{}
+	params := flora.FeedbackRecordParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))

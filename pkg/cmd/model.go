@@ -30,7 +30,7 @@ var modelsList = cli.Command{
 }
 
 func handleModelsList(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -48,7 +48,7 @@ func handleModelsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.ModelListParams{}
+	params := flora.ModelListParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))

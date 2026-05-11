@@ -55,13 +55,17 @@ var techniquesList = cli.Command{
 			Usage:     "Workspace identifier",
 			QueryPath: "workspace_id",
 		},
+		&requestflag.Flag[int64]{
+			Name:  "max-items",
+			Usage: "The maximum number of items to return (use -1 for unlimited).",
+		},
 	},
 	Action:          handleTechniquesList,
 	HideHelpCommand: true,
 }
 
 func handleTechniquesRetrieve(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("technique-id") && len(unusedArgs) > 0 {
 		cmd.Set("technique-id", unusedArgs[0])
@@ -103,7 +107,7 @@ func handleTechniquesRetrieve(ctx context.Context, cmd *cli.Command) error {
 }
 
 func handleTechniquesList(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -121,24 +125,38 @@ func handleTechniquesList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.TechniqueListParams{}
+	params := flora.TechniqueListParams{}
 
-	var res []byte
-	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Techniques.List(ctx, params, options...)
-	if err != nil {
-		return err
-	}
-
-	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(obj, ShowJSONOpts{
-		ExplicitFormat: explicitFormat,
-		Format:         format,
-		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "techniques list",
-		Transform:      transform,
-	})
+	if format == "raw" {
+		var res []byte
+		options = append(options, option.WithResponseBodyInto(&res))
+		_, err = client.Techniques.List(ctx, params, options...)
+		if err != nil {
+			return err
+		}
+		obj := gjson.ParseBytes(res)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "techniques list",
+			Transform:      transform,
+		})
+	} else {
+		iter := client.Techniques.ListAutoPaging(ctx, params, options...)
+		maxItems := int64(-1)
+		if cmd.IsSet("max-items") {
+			maxItems = cmd.Value("max-items").(int64)
+		}
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "techniques list",
+			Transform:      transform,
+		})
+	}
 }

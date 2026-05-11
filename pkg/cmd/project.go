@@ -78,6 +78,10 @@ var projectsList = cli.Command{
 			Usage:     "Search query",
 			QueryPath: "query",
 		},
+		&requestflag.Flag[int64]{
+			Name:  "max-items",
+			Usage: "The maximum number of items to return (use -1 for unlimited).",
+		},
 	},
 	Action:          handleProjectsList,
 	HideHelpCommand: true,
@@ -104,13 +108,17 @@ var projectsListNodes = cli.Command{
 			Usage:     "Maximum number of results to return",
 			QueryPath: "limit",
 		},
+		&requestflag.Flag[int64]{
+			Name:  "max-items",
+			Usage: "The maximum number of items to return (use -1 for unlimited).",
+		},
 	},
 	Action:          handleProjectsListNodes,
 	HideHelpCommand: true,
 }
 
 func handleProjectsCreate(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -128,7 +136,7 @@ func handleProjectsCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.ProjectNewParams{}
+	params := flora.ProjectNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -151,7 +159,7 @@ func handleProjectsCreate(ctx context.Context, cmd *cli.Command) error {
 }
 
 func handleProjectsRetrieve(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("project-id") && len(unusedArgs) > 0 {
 		cmd.Set("project-id", unusedArgs[0])
@@ -193,7 +201,7 @@ func handleProjectsRetrieve(ctx context.Context, cmd *cli.Command) error {
 }
 
 func handleProjectsList(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -211,30 +219,44 @@ func handleProjectsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.ProjectListParams{}
+	params := flora.ProjectListParams{}
 
-	var res []byte
-	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Projects.List(ctx, params, options...)
-	if err != nil {
-		return err
-	}
-
-	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(obj, ShowJSONOpts{
-		ExplicitFormat: explicitFormat,
-		Format:         format,
-		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "projects list",
-		Transform:      transform,
-	})
+	if format == "raw" {
+		var res []byte
+		options = append(options, option.WithResponseBodyInto(&res))
+		_, err = client.Projects.List(ctx, params, options...)
+		if err != nil {
+			return err
+		}
+		obj := gjson.ParseBytes(res)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "projects list",
+			Transform:      transform,
+		})
+	} else {
+		iter := client.Projects.ListAutoPaging(ctx, params, options...)
+		maxItems := int64(-1)
+		if cmd.IsSet("max-items") {
+			maxItems = cmd.Value("max-items").(int64)
+		}
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "projects list",
+			Transform:      transform,
+		})
+	}
 }
 
 func handleProjectsListNodes(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("project-id") && len(unusedArgs) > 0 {
 		cmd.Set("project-id", unusedArgs[0])
@@ -255,29 +277,48 @@ func handleProjectsListNodes(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.ProjectListNodesParams{}
+	params := flora.ProjectListNodesParams{}
 
-	var res []byte
-	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Projects.ListNodes(
-		ctx,
-		cmd.Value("project-id").(string),
-		params,
-		options...,
-	)
-	if err != nil {
-		return err
-	}
-
-	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(obj, ShowJSONOpts{
-		ExplicitFormat: explicitFormat,
-		Format:         format,
-		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "projects list-nodes",
-		Transform:      transform,
-	})
+	if format == "raw" {
+		var res []byte
+		options = append(options, option.WithResponseBodyInto(&res))
+		_, err = client.Projects.ListNodes(
+			ctx,
+			cmd.Value("project-id").(string),
+			params,
+			options...,
+		)
+		if err != nil {
+			return err
+		}
+		obj := gjson.ParseBytes(res)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "projects list-nodes",
+			Transform:      transform,
+		})
+	} else {
+		iter := client.Projects.ListNodesAutoPaging(
+			ctx,
+			cmd.Value("project-id").(string),
+			params,
+			options...,
+		)
+		maxItems := int64(-1)
+		if cmd.IsSet("max-items") {
+			maxItems = cmd.Value("max-items").(int64)
+		}
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "projects list-nodes",
+			Transform:      transform,
+		})
+	}
 }

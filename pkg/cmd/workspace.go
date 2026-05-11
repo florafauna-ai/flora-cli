@@ -23,7 +23,7 @@ var workspacesList = cli.Command{
 }
 
 func handleWorkspacesList(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {

@@ -14,8 +14,8 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var projectsAssetsAttach = cli.Command{
-	Name:    "attach",
+var projectsAssetsAttachAsset = cli.Command{
+	Name:    "attach-asset",
 	Usage:   "Attaches an existing ready asset to a project canvas as a static media node.\nMutating public API requests support an optional Idempotency-Key header for\nclient retries; duplicate keys within two hours return idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
@@ -32,12 +32,12 @@ var projectsAssetsAttach = cli.Command{
 			PathParam: "assetId",
 		},
 	},
-	Action:          handleProjectsAssetsAttach,
+	Action:          handleProjectsAssetsAttachAsset,
 	HideHelpCommand: true,
 }
 
-func handleProjectsAssetsAttach(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+func handleProjectsAssetsAttachAsset(ctx context.Context, cmd *cli.Command) error {
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("asset-id") && len(unusedArgs) > 0 {
 		cmd.Set("asset-id", unusedArgs[0])
@@ -58,13 +58,13 @@ func handleProjectsAssetsAttach(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.ProjectAssetAttachParams{
+	params := flora.ProjectAssetAttachAssetParams{
 		ProjectID: cmd.Value("project-id").(string),
 	}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Projects.Assets.Attach(
+	_, err = client.Projects.Assets.AttachAsset(
 		ctx,
 		cmd.Value("asset-id").(string),
 		params,
@@ -82,7 +82,7 @@ func handleProjectsAssetsAttach(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "projects:assets attach",
+		Title:          "projects:assets attach-asset",
 		Transform:      transform,
 	})
 }

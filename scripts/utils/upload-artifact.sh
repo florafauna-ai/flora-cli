@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 
-BINARY_NAME="florafauna-ai"
+BINARY_NAME="flora"
 DIST_DIR="dist"
 FILENAME="dist.zip"
 
