@@ -97,13 +97,17 @@ var assetsList = cli.Command{
 			Usage:     "Workspace identifier",
 			QueryPath: "workspace_id",
 		},
+		&requestflag.Flag[int64]{
+			Name:  "max-items",
+			Usage: "The maximum number of items to return (use -1 for unlimited).",
+		},
 	},
 	Action:          handleAssetsList,
 	HideHelpCommand: true,
 }
 
-var assetsCompleteUpload = cli.Command{
-	Name:    "complete-upload",
+var assetsComplete = cli.Command{
+	Name:    "complete",
 	Usage:   "Marks a signed asset upload as complete after the file has been uploaded.\nMutating public API requests support an optional Idempotency-Key header for\nclient retries; duplicate keys within two hours return idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
@@ -114,12 +118,12 @@ var assetsCompleteUpload = cli.Command{
 			PathParam: "assetId",
 		},
 	},
-	Action:          handleAssetsCompleteUpload,
+	Action:          handleAssetsComplete,
 	HideHelpCommand: true,
 }
 
-var assetsRetryUpload = cli.Command{
-	Name:    "retry-upload",
+var assetsRetry = cli.Command{
+	Name:    "retry",
 	Usage:   "Creates a fresh signed upload reservation for a failed or expired asset upload.\nMutating public API requests support an optional Idempotency-Key header for\nclient retries; duplicate keys within two hours return idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
@@ -130,12 +134,12 @@ var assetsRetryUpload = cli.Command{
 			PathParam: "assetId",
 		},
 	},
-	Action:          handleAssetsRetryUpload,
+	Action:          handleAssetsRetry,
 	HideHelpCommand: true,
 }
 
 func handleAssetsCreate(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -153,7 +157,7 @@ func handleAssetsCreate(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.AssetNewParams{}
+	params := flora.AssetNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -176,7 +180,7 @@ func handleAssetsCreate(ctx context.Context, cmd *cli.Command) error {
 }
 
 func handleAssetsRetrieve(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("asset-id") && len(unusedArgs) > 0 {
 		cmd.Set("asset-id", unusedArgs[0])
@@ -218,7 +222,7 @@ func handleAssetsRetrieve(ctx context.Context, cmd *cli.Command) error {
 }
 
 func handleAssetsList(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -236,30 +240,44 @@ func handleAssetsList(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.AssetListParams{}
+	params := flora.AssetListParams{}
 
-	var res []byte
-	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Assets.List(ctx, params, options...)
-	if err != nil {
-		return err
-	}
-
-	obj := gjson.ParseBytes(res)
 	format := cmd.Root().String("format")
 	explicitFormat := cmd.Root().IsSet("format")
 	transform := cmd.Root().String("transform")
-	return ShowJSON(obj, ShowJSONOpts{
-		ExplicitFormat: explicitFormat,
-		Format:         format,
-		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "assets list",
-		Transform:      transform,
-	})
+	if format == "raw" {
+		var res []byte
+		options = append(options, option.WithResponseBodyInto(&res))
+		_, err = client.Assets.List(ctx, params, options...)
+		if err != nil {
+			return err
+		}
+		obj := gjson.ParseBytes(res)
+		return ShowJSON(obj, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "assets list",
+			Transform:      transform,
+		})
+	} else {
+		iter := client.Assets.ListAutoPaging(ctx, params, options...)
+		maxItems := int64(-1)
+		if cmd.IsSet("max-items") {
+			maxItems = cmd.Value("max-items").(int64)
+		}
+		return ShowJSONIterator(iter, maxItems, ShowJSONOpts{
+			ExplicitFormat: explicitFormat,
+			Format:         format,
+			RawOutput:      cmd.Root().Bool("raw-output"),
+			Title:          "assets list",
+			Transform:      transform,
+		})
+	}
 }
 
-func handleAssetsCompleteUpload(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+func handleAssetsComplete(ctx context.Context, cmd *cli.Command) error {
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("asset-id") && len(unusedArgs) > 0 {
 		cmd.Set("asset-id", unusedArgs[0])
@@ -282,7 +300,7 @@ func handleAssetsCompleteUpload(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Assets.CompleteUpload(ctx, cmd.Value("asset-id").(string), options...)
+	_, err = client.Assets.Complete(ctx, cmd.Value("asset-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -295,13 +313,13 @@ func handleAssetsCompleteUpload(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "assets complete-upload",
+		Title:          "assets complete",
 		Transform:      transform,
 	})
 }
 
-func handleAssetsRetryUpload(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+func handleAssetsRetry(ctx context.Context, cmd *cli.Command) error {
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("asset-id") && len(unusedArgs) > 0 {
 		cmd.Set("asset-id", unusedArgs[0])
@@ -324,7 +342,7 @@ func handleAssetsRetryUpload(ctx context.Context, cmd *cli.Command) error {
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Assets.RetryUpload(ctx, cmd.Value("asset-id").(string), options...)
+	_, err = client.Assets.Retry(ctx, cmd.Value("asset-id").(string), options...)
 	if err != nil {
 		return err
 	}
@@ -337,7 +355,7 @@ func handleAssetsRetryUpload(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "assets retry-upload",
+		Title:          "assets retry",
 		Transform:      transform,
 	})
 }

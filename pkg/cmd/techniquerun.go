@@ -14,30 +14,8 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var techniquesRunsRetrieve = cli.Command{
-	Name:    "retrieve",
-	Usage:   "Returns status, progress, outputs, and error details for a technique run when it\nis accessible to the authenticated public API key.",
-	Suggest: true,
-	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:      "technique-id",
-			Usage:     "Technique identifier or slug",
-			Required:  true,
-			PathParam: "techniqueId",
-		},
-		&requestflag.Flag[string]{
-			Name:      "run-id",
-			Usage:     "Run identifier",
-			Required:  true,
-			PathParam: "runId",
-		},
-	},
-	Action:          handleTechniquesRunsRetrieve,
-	HideHelpCommand: true,
-}
-
-var techniquesRunsStart = requestflag.WithInnerFlags(cli.Command{
-	Name:    "start",
+var techniquesRunsCreate = requestflag.WithInnerFlags(cli.Command{
+	Name:    "create",
 	Usage:   "Starts a run for a specific technique using the backward-compatible nested\nroute. Mutating public API requests support an optional Idempotency-Key header\nfor client retries; duplicate keys within two hours return\nidempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
@@ -68,7 +46,7 @@ var techniquesRunsStart = requestflag.WithInnerFlags(cli.Command{
 			BodyPath: "idempotency_key",
 		},
 	},
-	Action:          handleTechniquesRunsStart,
+	Action:          handleTechniquesRunsCreate,
 	HideHelpCommand: true,
 }, map[string][]requestflag.HasOuterFlag{
 	"input": {
@@ -90,8 +68,79 @@ var techniquesRunsStart = requestflag.WithInnerFlags(cli.Command{
 	},
 })
 
+var techniquesRunsRetrieve = cli.Command{
+	Name:    "retrieve",
+	Usage:   "Returns status, progress, outputs, and error details for a technique run when it\nis accessible to the authenticated public API key.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "technique-id",
+			Usage:     "Technique identifier or slug",
+			Required:  true,
+			PathParam: "techniqueId",
+		},
+		&requestflag.Flag[string]{
+			Name:      "run-id",
+			Usage:     "Run identifier",
+			Required:  true,
+			PathParam: "runId",
+		},
+	},
+	Action:          handleTechniquesRunsRetrieve,
+	HideHelpCommand: true,
+}
+
+func handleTechniquesRunsCreate(ctx context.Context, cmd *cli.Command) error {
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("technique-id") && len(unusedArgs) > 0 {
+		cmd.Set("technique-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		ApplicationJSON,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	params := flora.TechniqueRunNewParams{}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Techniques.Runs.New(
+		ctx,
+		cmd.Value("technique-id").(string),
+		params,
+		options...,
+	)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "techniques:runs create",
+		Transform:      transform,
+	})
+}
+
 func handleTechniquesRunsRetrieve(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 	if !cmd.IsSet("run-id") && len(unusedArgs) > 0 {
 		cmd.Set("run-id", unusedArgs[0])
@@ -112,7 +161,7 @@ func handleTechniquesRunsRetrieve(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.TechniqueRunGetParams{
+	params := flora.TechniqueRunGetParams{
 		TechniqueID: cmd.Value("technique-id").(string),
 	}
 
@@ -137,55 +186,6 @@ func handleTechniquesRunsRetrieve(ctx context.Context, cmd *cli.Command) error {
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "techniques:runs retrieve",
-		Transform:      transform,
-	})
-}
-
-func handleTechniquesRunsStart(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
-	unusedArgs := cmd.Args().Slice()
-	if !cmd.IsSet("technique-id") && len(unusedArgs) > 0 {
-		cmd.Set("technique-id", unusedArgs[0])
-		unusedArgs = unusedArgs[1:]
-	}
-	if len(unusedArgs) > 0 {
-		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
-	}
-
-	options, err := flagOptions(
-		cmd,
-		apiquery.NestedQueryFormatBrackets,
-		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
-		false,
-	)
-	if err != nil {
-		return err
-	}
-
-	params := florafaunaai.TechniqueRunStartParams{}
-
-	var res []byte
-	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Techniques.Runs.Start(
-		ctx,
-		cmd.Value("technique-id").(string),
-		params,
-		options...,
-	)
-	if err != nil {
-		return err
-	}
-
-	obj := gjson.ParseBytes(res)
-	format := cmd.Root().String("format")
-	explicitFormat := cmd.Root().IsSet("format")
-	transform := cmd.Root().String("transform")
-	return ShowJSON(obj, ShowJSONOpts{
-		ExplicitFormat: explicitFormat,
-		Format:         format,
-		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "techniques:runs start",
 		Transform:      transform,
 	})
 }

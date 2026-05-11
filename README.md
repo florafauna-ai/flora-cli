@@ -1,6 +1,6 @@
-# Florafauna AI CLI
+# Flora CLI
 
-The official CLI for the Florafauna AI REST API.
+The official CLI for the Flora REST API.
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -11,7 +11,7 @@ It is generated with [Stainless](https://www.stainless.com/).
 To test or install the CLI locally, you need [Go](https://go.dev/doc/install) version 1.22 or later installed.
 
 ```sh
-go install 'github.com/stainless-sdks/florafauna-ai-cli/cmd/florafauna-ai@latest'
+go install 'github.com/stainless-sdks/florafauna-ai-cli/cmd/flora@latest'
 ```
 
 Once you have run `go install`, the binary is placed in your Go bin directory:
@@ -40,11 +40,11 @@ After cloning the git repository for this project, you can use the
 The CLI follows a resource-based command structure:
 
 ```sh
-florafauna-ai [resource] <command> [flags...]
+flora [resource] <command> [flags...]
 ```
 
 ```sh
-florafauna-ai workspaces list \
+flora workspaces list \
   --api-key 'My API Key'
 ```
 
@@ -52,13 +52,13 @@ For details about specific commands, use the `--help` flag.
 
 ### Environment variables
 
-| Environment variable    | Required | Default value |
-| ----------------------- | -------- | ------------- |
-| `FLORAFAUNA_AI_API_KEY` | no       | `null`        |
+| Environment variable | Required | Default value |
+| -------------------- | -------- | ------------- |
+| `FLORA_API_KEY`      | no       | `null`        |
 
 ### Global flags
 
-- `--api-key` (can also be set with `FLORAFAUNA_AI_API_KEY` env var)
+- `--api-key` (can also be set with `FLORA_API_KEY` env var)
 - `--help` - Show command line usage
 - `--debug` - Enable debug logging (includes HTTP request/response details)
 - `--version`, `-v` - Show the CLI version
@@ -73,15 +73,15 @@ For details about specific commands, use the `--help` flag.
 To pass files to your API, you can use the `@myfile.ext` syntax:
 
 ```bash
-florafauna-ai <command> --arg @abe.jpg
+flora <command> --arg @abe.jpg
 ```
 
 Files can also be passed inside JSON or YAML blobs:
 
 ```bash
-florafauna-ai <command> --arg '{image: "@abe.jpg"}'
+flora <command> --arg '{image: "@abe.jpg"}'
 # Equivalent:
-florafauna-ai <command> <<YAML
+flora <command> <<YAML
 arg:
   image: "@abe.jpg"
 YAML
@@ -91,7 +91,7 @@ If you need to pass a string literal that begins with an `@` sign, you can
 escape the `@` sign to avoid accidentally passing a file.
 
 ```bash
-florafauna-ai <command> --username '\@abe'
+flora <command> --username '\@abe'
 ```
 
 #### Explicit encoding
@@ -105,12 +105,12 @@ base64-encoding). Note that absolute paths will begin with `@file://` or
 `@data://`, followed by a third `/` (for example, `@file:///tmp/file.txt`).
 
 ```bash
-florafauna-ai <command> --arg @data://file.txt
+flora <command> --arg @data://file.txt
 ```
 
 ## Linking different Go SDK versions
 
-You can link the CLI against a different version of the Florafauna AI Go SDK
+You can link the CLI against a different version of the Flora Go SDK
 for development purposes using the `./scripts/link` script.
 
 To link to a specific version from a repository (version can be a branch,
@@ -123,7 +123,7 @@ git tag, or commit hash):
 To link to a local copy of the SDK:
 
 ```bash
-./scripts/link ../path/to/florafaunaai-go
+./scripts/link ../path/to/flora-go
 ```
 
-If you run the link script without any arguments, it will default to `../florafaunaai-go`.
+If you run the link script without any arguments, it will default to `../flora-go`.

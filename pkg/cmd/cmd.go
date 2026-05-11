@@ -25,8 +25,8 @@ var (
 
 func init() {
 	Command = &cli.Command{
-		Name:      "florafauna-ai",
-		Usage:     "CLI for the florafauna-ai API",
+		Name:      "flora",
+		Usage:     "CLI for the flora API",
 		Suggest:   true,
 		Version:   Version,
 		ErrWriter: &CommandErrorBuffer,
@@ -80,10 +80,40 @@ func init() {
 			},
 			&requestflag.Flag[string]{
 				Name:    "api-key",
-				Sources: cli.EnvVars("FLORAFAUNA_AI_API_KEY"),
+				Sources: cli.EnvVars("FLORA_API_KEY"),
 			},
 		},
 		Commands: []*cli.Command{
+			{
+				Name:     "techniques",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&techniquesRetrieve,
+					&techniquesList,
+				},
+			},
+			{
+				Name:     "techniques:runs",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&techniquesRunsCreate,
+					&techniquesRunsRetrieve,
+				},
+			},
+			{
+				Name:     "assets",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&assetsCreate,
+					&assetsRetrieve,
+					&assetsList,
+					&assetsComplete,
+					&assetsRetry,
+				},
+			},
 			{
 				Name:     "workspaces",
 				Category: "API RESOURCE",
@@ -108,7 +138,7 @@ func init() {
 				Category: "API RESOURCE",
 				Suggest:  true,
 				Commands: []*cli.Command{
-					&projectsAssetsAttach,
+					&projectsAssetsAttachAsset,
 				},
 			},
 			{
@@ -117,36 +147,6 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&modelsList,
-				},
-			},
-			{
-				Name:     "techniques",
-				Category: "API RESOURCE",
-				Suggest:  true,
-				Commands: []*cli.Command{
-					&techniquesRetrieve,
-					&techniquesList,
-				},
-			},
-			{
-				Name:     "techniques:runs",
-				Category: "API RESOURCE",
-				Suggest:  true,
-				Commands: []*cli.Command{
-					&techniquesRunsRetrieve,
-					&techniquesRunsStart,
-				},
-			},
-			{
-				Name:     "assets",
-				Category: "API RESOURCE",
-				Suggest:  true,
-				Commands: []*cli.Command{
-					&assetsCreate,
-					&assetsRetrieve,
-					&assetsList,
-					&assetsCompleteUpload,
-					&assetsRetryUpload,
 				},
 			},
 			{
@@ -169,7 +169,7 @@ func init() {
 			{
 				Name:            "@manpages",
 				Usage:           "Generate documentation for 'man'",
-				UsageText:       "florafauna-ai @manpages [-o florafauna-ai.1] [--gzip]",
+				UsageText:       "flora @manpages [-o flora.1] [--gzip]",
 				Hidden:          true,
 				Action:          generateManpages,
 				HideHelpCommand: true,
@@ -222,7 +222,7 @@ func generateManpages(ctx context.Context, c *cli.Command) error {
 		// handle error
 	}
 	if c.Bool("text") {
-		file, err := os.Create(filepath.Join(dir, "man1", "florafauna-ai.1"))
+		file, err := os.Create(filepath.Join(dir, "man1", "flora.1"))
 		if err != nil {
 			return err
 		}
@@ -232,7 +232,7 @@ func generateManpages(ctx context.Context, c *cli.Command) error {
 		}
 	}
 	if c.Bool("gzip") {
-		file, err := os.Create(filepath.Join(dir, "man1", "florafauna-ai.1.gz"))
+		file, err := os.Create(filepath.Join(dir, "man1", "flora.1.gz"))
 		if err != nil {
 			return err
 		}

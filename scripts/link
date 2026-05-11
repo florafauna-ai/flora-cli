@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 # Mark the necessary Go modules as private to avoid Go's proxy
 export GOPRIVATE="${GOPRIVATE:+$GOPRIVATE,}github.com/stainless-sdks/florafauna-ai-go"
 
-REPLACEMENT="${1:-"../florafauna-ai-go"}"
+REPLACEMENT="${1:-"../flora-go"}"
 echo "==> Replacing Go SDK with $REPLACEMENT"
 if [[ -d "$REPLACEMENT" ]] || go list -m "$REPLACEMENT" >/dev/null; then
     go mod edit -replace github.com/stainless-sdks/florafauna-ai-go="$REPLACEMENT"

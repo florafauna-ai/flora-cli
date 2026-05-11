@@ -23,8 +23,8 @@ func main() {
 		prepareForAutocomplete(app)
 	}
 
-	if baseURL, ok := os.LookupEnv("FLORAFAUNA_AI_BASE_URL"); ok {
-		if err := cmd.ValidateBaseURL(baseURL, "FLORAFAUNA_AI_BASE_URL"); err != nil {
+	if baseURL, ok := os.LookupEnv("FLORA_BASE_URL"); ok {
+		if err := cmd.ValidateBaseURL(baseURL, "FLORA_BASE_URL"); err != nil {
 			fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			os.Exit(1)
 		}
@@ -38,7 +38,7 @@ func main() {
 			exitCode = exitErr.ExitCode()
 		}
 
-		var apierr *florafaunaai.Error
+		var apierr *flora.Error
 		if errors.As(err, &apierr) {
 			fmt.Fprintf(os.Stderr, "%s %q: %d %s\n", apierr.Request.Method, apierr.Request.URL, apierr.Response.StatusCode, http.StatusText(apierr.Response.StatusCode))
 			format := app.String("format-error")

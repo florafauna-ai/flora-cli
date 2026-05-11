@@ -58,6 +58,7 @@ func TestAssetsList(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"assets", "list",
+			"--max-items", "10",
 			"--cursor", "cursor",
 			"--limit", "1",
 			"--project-id", "prj_abc123",
@@ -67,25 +68,25 @@ func TestAssetsList(t *testing.T) {
 	})
 }
 
-func TestAssetsCompleteUpload(t *testing.T) {
+func TestAssetsComplete(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"assets", "complete-upload",
+			"assets", "complete",
 			"--asset-id", "asset_abc123",
 		)
 	})
 }
 
-func TestAssetsRetryUpload(t *testing.T) {
+func TestAssetsRetry(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"assets", "retry-upload",
+			"assets", "retry",
 			"--asset-id", "asset_abc123",
 		)
 	})

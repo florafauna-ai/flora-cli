@@ -9,26 +9,13 @@ import (
 	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
 )
 
-func TestTechniquesRunsRetrieve(t *testing.T) {
+func TestTechniquesRunsCreate(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"techniques:runs", "retrieve",
-			"--technique-id", "tech_def_abc123",
-			"--run-id", "run_abc123",
-		)
-	})
-}
-
-func TestTechniquesRunsStart(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
-	t.Run("regular flags", func(t *testing.T) {
-		mocktest.TestRunMockTestWithFlags(
-			t,
-			"--api-key", "string",
-			"techniques:runs", "start",
+			"techniques:runs", "create",
 			"--technique-id", "tech_def_abc123",
 			"--input", "{id: id, type: imageUrl, value: value}",
 			"--mode", "async",
@@ -39,13 +26,13 @@ func TestTechniquesRunsStart(t *testing.T) {
 
 	t.Run("inner flags", func(t *testing.T) {
 		// Check that inner flags have been set up correctly
-		requestflag.CheckInnerFlags(techniquesRunsStart)
+		requestflag.CheckInnerFlags(techniquesRunsCreate)
 
 		// Alternative argument passing style using inner flags
 		mocktest.TestRunMockTestWithFlags(
 			t,
 			"--api-key", "string",
-			"techniques:runs", "start",
+			"techniques:runs", "create",
 			"--technique-id", "tech_def_abc123",
 			"--input.id", "id",
 			"--input.type", "imageUrl",
@@ -69,8 +56,21 @@ func TestTechniquesRunsStart(t *testing.T) {
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
 			"--api-key", "string",
-			"techniques:runs", "start",
+			"techniques:runs", "create",
 			"--technique-id", "tech_def_abc123",
+		)
+	})
+}
+
+func TestTechniquesRunsRetrieve(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"techniques:runs", "retrieve",
+			"--technique-id", "tech_def_abc123",
+			"--run-id", "run_abc123",
 		)
 	})
 }

@@ -87,7 +87,7 @@ var runsStartTechnique = cli.Command{
 }
 
 func handleRunsStartGeneration(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -105,7 +105,7 @@ func handleRunsStartGeneration(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.RunStartGenerationParams{}
+	params := flora.RunStartGenerationParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
@@ -128,7 +128,7 @@ func handleRunsStartGeneration(ctx context.Context, cmd *cli.Command) error {
 }
 
 func handleRunsStartTechnique(ctx context.Context, cmd *cli.Command) error {
-	client := florafaunaai.NewClient(getDefaultRequestOptions(cmd)...)
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
 	if len(unusedArgs) > 0 {
@@ -146,7 +146,7 @@ func handleRunsStartTechnique(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := florafaunaai.RunStartTechniqueParams{}
+	params := flora.RunStartTechniqueParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
