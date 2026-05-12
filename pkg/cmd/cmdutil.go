@@ -16,8 +16,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/florafauna-ai/flora-cli/internal/jsonview"
 	"github.com/florafauna-ai/flora-go/option"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/jsonview"
 
 	"github.com/charmbracelet/x/term"
 	"github.com/itchyny/json2yaml"

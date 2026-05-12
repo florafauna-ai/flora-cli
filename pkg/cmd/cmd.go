@@ -12,8 +12,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/autocomplete"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
+	"github.com/florafauna-ai/flora-cli/internal/autocomplete"
+	"github.com/florafauna-ai/flora-cli/internal/requestflag"
 	docs "github.com/urfave/cli-docs/v3"
 	"github.com/urfave/cli/v3"
 )

@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/jsonview"
+	"github.com/florafauna-ai/flora-cli/internal/jsonview"
 )
 
 func TestStreamOutput(t *testing.T) {

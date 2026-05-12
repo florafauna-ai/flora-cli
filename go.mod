@@ -1,4 +1,4 @@
-module github.com/stainless-sdks/florafauna-ai-cli
+module github.com/florafauna-ai/flora-cli
 
 go 1.25
 
