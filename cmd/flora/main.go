@@ -10,8 +10,8 @@ import (
 	"os"
 	"slices"
 
+	"github.com/florafauna-ai/flora-go"
 	"github.com/stainless-sdks/florafauna-ai-cli/pkg/cmd"
-	"github.com/stainless-sdks/florafauna-ai-go"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
 )

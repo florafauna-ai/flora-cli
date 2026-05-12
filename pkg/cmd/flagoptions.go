@@ -16,11 +16,11 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/florafauna-ai/flora-go/option"
 	"github.com/stainless-sdks/florafauna-ai-cli/internal/apiform"
 	"github.com/stainless-sdks/florafauna-ai-cli/internal/apiquery"
 	"github.com/stainless-sdks/florafauna-ai-cli/internal/debugmiddleware"
 	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
-	"github.com/stainless-sdks/florafauna-ai-go/option"
 
 	"github.com/goccy/go-yaml"
 	"github.com/urfave/cli/v3"

@@ -6,9 +6,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/florafauna-ai/flora-go"
+	"github.com/florafauna-ai/flora-go/option"
 	"github.com/stainless-sdks/florafauna-ai-cli/internal/apiquery"
-	"github.com/stainless-sdks/florafauna-ai-go"
-	"github.com/stainless-sdks/florafauna-ai-go/option"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
 )
