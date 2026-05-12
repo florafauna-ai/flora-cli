@@ -19,39 +19,10 @@ var runsStartGeneration = cli.Command{
 	Usage:   "Starts a model generation run in a project canvas using a prompt, workspace,\nproject, optional model, and optional model parameters. Mutating public API\nrequests support an optional Idempotency-Key header for client retries;\nduplicate keys within two hours return idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
-		&requestflag.Flag[string]{
-			Name:     "project-id",
-			Usage:    "Project identifier",
+		&requestflag.Flag[any]{
+			Name:     "body",
 			Required: true,
-			BodyPath: "project_id",
-		},
-		&requestflag.Flag[string]{
-			Name:     "prompt",
-			Usage:    "Generation prompt",
-			Required: true,
-			BodyPath: "prompt",
-		},
-		&requestflag.Flag[string]{
-			Name:     "type",
-			Usage:    "Generation type",
-			Required: true,
-			BodyPath: "type",
-		},
-		&requestflag.Flag[string]{
-			Name:     "workspace-id",
-			Usage:    "Workspace identifier",
-			Required: true,
-			BodyPath: "workspace_id",
-		},
-		&requestflag.Flag[string]{
-			Name:     "model",
-			Usage:    "Model endpoint ID",
-			BodyPath: "model",
-		},
-		&requestflag.Flag[map[string]any]{
-			Name:     "params",
-			Usage:    "Model parameters",
-			BodyPath: "params",
+			BodyRoot: true,
 		},
 	},
 	Action:          handleRunsStartGeneration,
@@ -63,23 +34,10 @@ var runsStartTechnique = cli.Command{
 	Usage:   "Starts a technique run through the normalized top-level run resource. Mutating\npublic API requests support an optional Idempotency-Key header for client\nretries; duplicate keys within two hours return idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
-		&requestflag.Flag[map[string]any]{
-			Name:     "inputs",
-			Usage:    "Technique inputs",
+		&requestflag.Flag[any]{
+			Name:     "body",
 			Required: true,
-			BodyPath: "inputs",
-		},
-		&requestflag.Flag[string]{
-			Name:     "technique-id",
-			Usage:    "Technique identifier",
-			Required: true,
-			BodyPath: "technique_id",
-		},
-		&requestflag.Flag[string]{
-			Name:     "workspace-id",
-			Usage:    "Workspace identifier",
-			Required: true,
-			BodyPath: "workspace_id",
+			BodyRoot: true,
 		},
 	},
 	Action:          handleRunsStartTechnique,
