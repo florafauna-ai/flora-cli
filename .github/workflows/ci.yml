@@ -15,7 +15,7 @@ on:
       - 'stl-preview-base/**'
 
 env:
-  GOPRIVATE: github.com/stainless-sdks/florafauna-ai-go
+  GOPRIVATE: github.com/florafauna-ai/flora-go,github.com/stainless-sdks/florafauna-ai-go
 
 jobs:
   lint:
