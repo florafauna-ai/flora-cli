@@ -5,8 +5,8 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/mocktest"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
+	"github.com/florafauna-ai/flora-cli/internal/mocktest"
+	"github.com/florafauna-ai/flora-cli/internal/requestflag"
 )
 
 func TestTechniquesRunsCreate(t *testing.T) {
