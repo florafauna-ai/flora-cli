@@ -159,14 +159,6 @@ func init() {
 				},
 			},
 			{
-				Name:     "feedback",
-				Category: "API RESOURCE",
-				Suggest:  true,
-				Commands: []*cli.Command{
-					&feedbackRecord,
-				},
-			},
-			{
 				Name:            "@manpages",
 				Usage:           "Generate documentation for 'man'",
 				UsageText:       "flora @manpages [-o flora.1] [--gzip]",
