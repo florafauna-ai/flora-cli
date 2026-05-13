@@ -28,7 +28,7 @@ func TestTechniquesList(t *testing.T) {
 			"--api-key", "string",
 			"techniques", "list",
 			"--max-items", "10",
-			"--cursor", "cursor",
+			"--cursor", "eyJvZmZzZXQiOjIwfQ",
 			"--limit", "1",
 			"--query", "logo",
 			"--workspace-id", "ws_abc123",

@@ -15,13 +15,22 @@ func TestAssetsCreate(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"assets", "create",
-			"--body", "{}",
+			"--source", "signed-url",
+			"--workspace-id", "ws_abc123",
+			"--content-type", "image/png",
+			"--file-name", "hero.png",
+			"--folder", "campaign-assets",
 		)
 	})
 
 	t.Run("piping data", func(t *testing.T) {
 		// Test piping YAML data over stdin
-		pipeData := []byte("{}")
+		pipeData := []byte("" +
+			"source: signed-url\n" +
+			"workspace_id: ws_abc123\n" +
+			"content_type: image/png\n" +
+			"file_name: hero.png\n" +
+			"folder: campaign-assets\n")
 		mocktest.TestRunMockTestWithPipeAndFlags(
 			t, pipeData,
 			"--api-key", "string",
@@ -50,7 +59,7 @@ func TestAssetsList(t *testing.T) {
 			"--api-key", "string",
 			"assets", "list",
 			"--max-items", "10",
-			"--cursor", "cursor",
+			"--cursor", "eyJvZmZzZXQiOjIwfQ",
 			"--limit", "1",
 			"--project-id", "prj_abc123",
 			"--query", "logo",

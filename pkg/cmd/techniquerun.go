@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var techniquesRunsCreate = cli.Command{
+var techniquesRunsCreate = requestflag.WithInnerFlags(cli.Command{
 	Name:    "create",
 	Usage:   "Starts a run for a specific technique using the backward-compatible nested\nroute. Mutating public API requests support an optional Idempotency-Key header\nfor client retries; duplicate keys within two hours return\nidempotency_duplicate.",
 	Suggest: true,
@@ -25,10 +25,50 @@ var techniquesRunsCreate = cli.Command{
 			Required:  true,
 			PathParam: "techniqueId",
 		},
+		&requestflag.Flag[[]map[string]any]{
+			Name:     "input",
+			Usage:    "Technique inputs",
+			Required: true,
+			BodyPath: "inputs",
+		},
+		&requestflag.Flag[string]{
+			Name:     "mode",
+			Usage:    "Technique run execution mode",
+			Required: true,
+			BodyPath: "mode",
+		},
+		&requestflag.Flag[string]{
+			Name:     "callback-url",
+			Usage:    "HTTPS callback URL for asynchronous run completion notifications",
+			BodyPath: "callback_url",
+		},
+		&requestflag.Flag[string]{
+			Name:     "idempotency-key",
+			Usage:    "Idempotency key for safely retrying requests",
+			BodyPath: "idempotency_key",
+		},
 	},
 	Action:          handleTechniquesRunsCreate,
 	HideHelpCommand: true,
-}
+}, map[string][]requestflag.HasOuterFlag{
+	"input": {
+		&requestflag.InnerFlag[string]{
+			Name:       "input.id",
+			Usage:      "Technique input identifier",
+			InnerField: "id",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "input.type",
+			Usage:      "Technique input type",
+			InnerField: "type",
+		},
+		&requestflag.InnerFlag[string]{
+			Name:       "input.value",
+			Usage:      "Technique input value",
+			InnerField: "value",
+		},
+	},
+})
 
 var techniquesRunsRetrieve = cli.Command{
 	Name:    "retrieve",
@@ -67,16 +107,23 @@ func handleTechniquesRunsCreate(ctx context.Context, cmd *cli.Command) error {
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
 		apiquery.ArrayQueryFormatComma,
-		EmptyBody,
+		ApplicationJSON,
 		false,
 	)
 	if err != nil {
 		return err
 	}
 
+	params := flora.TechniqueRunNewParams{}
+
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Techniques.Runs.New(ctx, cmd.Value("technique-id").(string), options...)
+	_, err = client.Techniques.Runs.New(
+		ctx,
+		cmd.Value("technique-id").(string),
+		params,
+		options...,
+	)
 	if err != nil {
 		return err
 	}
