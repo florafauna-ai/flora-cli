@@ -54,7 +54,7 @@ func TestProjectsList(t *testing.T) {
 			"projects", "list",
 			"--max-items", "10",
 			"--workspace-id", "ws_abc123",
-			"--cursor", "cursor",
+			"--cursor", "eyJvZmZzZXQiOjIwfQ",
 			"--limit", "1",
 			"--query", "logo",
 		)
@@ -70,7 +70,7 @@ func TestProjectsListNodes(t *testing.T) {
 			"projects", "list-nodes",
 			"--max-items", "10",
 			"--project-id", "prj_abc123",
-			"--cursor", "cursor",
+			"--cursor", "eyJvZmZzZXQiOjIwfQ",
 			"--limit", "1",
 		)
 	})

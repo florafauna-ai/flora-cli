@@ -19,10 +19,32 @@ var assetsCreate = cli.Command{
 	Usage:   "Creates an asset from an allowlisted source URL or reserves a signed upload URL.\nMutating public API requests support an optional Idempotency-Key header for\nclient retries; duplicate keys within two hours return idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
-		&requestflag.Flag[any]{
-			Name:     "body",
+		&requestflag.Flag[string]{
+			Name:     "source",
+			Usage:    "Asset source URL or signed-url upload mode",
 			Required: true,
-			BodyRoot: true,
+			BodyPath: "source",
+		},
+		&requestflag.Flag[string]{
+			Name:     "workspace-id",
+			Usage:    "Workspace identifier",
+			Required: true,
+			BodyPath: "workspace_id",
+		},
+		&requestflag.Flag[string]{
+			Name:     "content-type",
+			Usage:    "Asset content type",
+			BodyPath: "content_type",
+		},
+		&requestflag.Flag[string]{
+			Name:     "file-name",
+			Usage:    "Asset file name",
+			BodyPath: "file_name",
+		},
+		&requestflag.Flag[string]{
+			Name:     "folder",
+			Usage:    "Destination folder",
+			BodyPath: "folder",
 		},
 	},
 	Action:          handleAssetsCreate,

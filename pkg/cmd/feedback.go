@@ -39,6 +39,7 @@ var feedbackRecord = cli.Command{
 		},
 		&requestflag.Flag[[]string]{
 			Name:     "attempted-tool",
+			Usage:    "Tools or capabilities attempted before submitting feedback",
 			BodyPath: "attempted_tools",
 		},
 		&requestflag.Flag[string]{

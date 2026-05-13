@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/florafauna-ai/flora-cli/internal/mocktest"
+	"github.com/florafauna-ai/flora-cli/internal/requestflag"
 )
 
 func TestTechniquesRunsCreate(t *testing.T) {
@@ -13,6 +14,47 @@ func TestTechniquesRunsCreate(t *testing.T) {
 	t.Run("regular flags", func(t *testing.T) {
 		mocktest.TestRunMockTestWithFlags(
 			t,
+			"--api-key", "string",
+			"techniques:runs", "create",
+			"--technique-id", "tech_def_abc123",
+			"--input", "{id: id, type: text, value: value}",
+			"--mode", "async",
+			"--callback-url", "https://example.com",
+			"--idempotency-key", "idempotency_key",
+		)
+	})
+
+	t.Run("inner flags", func(t *testing.T) {
+		// Check that inner flags have been set up correctly
+		requestflag.CheckInnerFlags(techniquesRunsCreate)
+
+		// Alternative argument passing style using inner flags
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"techniques:runs", "create",
+			"--technique-id", "tech_def_abc123",
+			"--input.id", "id",
+			"--input.type", "text",
+			"--input.value", "value",
+			"--mode", "async",
+			"--callback-url", "https://example.com",
+			"--idempotency-key", "idempotency_key",
+		)
+	})
+
+	t.Run("piping data", func(t *testing.T) {
+		// Test piping YAML data over stdin
+		pipeData := []byte("" +
+			"inputs:\n" +
+			"  - id: id\n" +
+			"    type: text\n" +
+			"    value: value\n" +
+			"mode: async\n" +
+			"callback_url: https://example.com\n" +
+			"idempotency_key: idempotency_key\n")
+		mocktest.TestRunMockTestWithPipeAndFlags(
+			t, pipeData,
 			"--api-key", "string",
 			"techniques:runs", "create",
 			"--technique-id", "tech_def_abc123",
