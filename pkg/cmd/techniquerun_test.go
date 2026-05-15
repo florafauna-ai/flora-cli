@@ -16,7 +16,7 @@ func TestTechniquesRunsCreate(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques:runs", "create",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 			"--input", "{id: id, type: text, value: value}",
 			"--mode", "async",
 			"--callback-url", "https://example.com",
@@ -33,7 +33,7 @@ func TestTechniquesRunsCreate(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques:runs", "create",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 			"--input.id", "id",
 			"--input.type", "text",
 			"--input.value", "value",
@@ -57,7 +57,7 @@ func TestTechniquesRunsCreate(t *testing.T) {
 			t, pipeData,
 			"--api-key", "string",
 			"techniques:runs", "create",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 		)
 	})
 }
@@ -69,7 +69,7 @@ func TestTechniquesRunsRetrieve(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques:runs", "retrieve",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 			"--run-id", "run_abc123",
 		)
 	})
