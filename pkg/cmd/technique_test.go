@@ -15,7 +15,7 @@ func TestTechniquesRetrieve(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques", "retrieve",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 		)
 	})
 }
