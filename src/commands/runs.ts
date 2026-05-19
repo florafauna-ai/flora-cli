@@ -40,6 +40,31 @@ const startGeneration = defineCommand({
   },
 });
 
+const retrieve = defineCommand({
+  meta: { name: "retrieve", description: "Get run status and outputs" },
+  args: {
+    "run-id": {
+      type: "positional",
+      description: "Run identifier",
+      required: true,
+    },
+  },
+  async run({ args }) {
+    const global = args as unknown as GlobalArgs;
+    const baseURL = global["base-url"] ?? process.env["FLORA_BASE_URL"] ?? "https://app.flora.ai/api/v1";
+    const apiKey = global["api-key"] ?? process.env["FLORA_API_KEY"] ?? "";
+    const res = await fetch(`${baseURL}/runs/${encodeURIComponent(args["run-id"])}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    if (!res.ok) {
+      console.error(`API Error (${res.status}): ${await res.text()}`);
+      process.exit(1);
+    }
+    const data = await res.json();
+    console.log(JSON.stringify(data, null, global.format === "raw" ? 0 : 2));
+  },
+});
+
 const startTechnique = defineCommand({
   meta: { name: "start-technique", description: "Start a technique run via the top-level run resource" },
   args: {
@@ -63,6 +88,6 @@ const startTechnique = defineCommand({
 });
 
 export default defineCommand({
-  meta: { name: "runs", description: "Top-level run creation" },
-  subCommands: { "start-generation": startGeneration, "start-technique": startTechnique },
+  meta: { name: "runs", description: "Run management" },
+  subCommands: { retrieve, "start-generation": startGeneration, "start-technique": startTechnique },
 });
