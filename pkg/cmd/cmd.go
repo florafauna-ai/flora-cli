@@ -142,6 +142,24 @@ func init() {
 				},
 			},
 			{
+				Name:     "projects:canvas",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&projectsCanvasRetrieve,
+					&projectsCanvasUpdate,
+				},
+			},
+			{
+				Name:     "projects:actions",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&projectsActionsCreate,
+					&projectsActionsRun,
+				},
+			},
+			{
 				Name:     "models",
 				Category: "API RESOURCE",
 				Suggest:  true,
@@ -156,6 +174,14 @@ func init() {
 				Commands: []*cli.Command{
 					&runsStartGeneration,
 					&runsStartTechnique,
+				},
+			},
+			{
+				Name:     "generations",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&generationsCreate,
 				},
 			},
 			{
