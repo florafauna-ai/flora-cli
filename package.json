@@ -1,0 +1,32 @@
+{
+  "name": "@flora-ai/cli",
+  "version": "0.1.0",
+  "description": "The official CLI for the Flora REST API",
+  "type": "module",
+  "bin": {
+    "flora": "./bin/flora.mjs"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flora-ai/flora": "^0.6.0",
+    "citty": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "Proprietary"
+}

@@ -1,38 +1,22 @@
 # Flora CLI
 
-The official CLI for the Flora REST API.
-
-It is generated with [Stainless](https://www.stainless.com/).
+The official CLI for the Flora REST API, built with [citty](https://github.com/unjs/citty) and the [@flora-ai/flora](https://www.npmjs.com/package/@flora-ai/flora) TypeScript SDK.
 
 ## Installation
 
-### Installing with Go
-
-To test or install the CLI locally, you need [Go](https://go.dev/doc/install) version 1.22 or later installed.
+Requires Node.js 18+.
 
 ```sh
-go install 'github.com/stainless-sdks/florafauna-ai-cli/cmd/flora@latest'
-```
-
-Once you have run `go install`, the binary is placed in your Go bin directory:
-
-- **Default location**: `$HOME/go/bin` (or `$GOPATH/bin` if GOPATH is set)
-- **Check your path**: Run `go env GOPATH` to see the base directory
-
-If commands aren't found after installation, add the Go bin directory to your PATH:
-
-```sh
-# Add to your shell profile (.zshrc, .bashrc, etc.)
-export PATH="$PATH:$(go env GOPATH)/bin"
+npm install -g @flora-ai/cli
 ```
 
 ### Running Locally
 
-After cloning the git repository for this project, you can use the
-`scripts/run` script to run the tool locally:
-
 ```sh
-./scripts/run args...
+git clone https://github.com/florafauna-ai/flora-cli.git
+cd flora-cli
+pnpm install
+pnpm dev -- --help
 ```
 
 ## Usage
@@ -40,12 +24,11 @@ After cloning the git repository for this project, you can use the
 The CLI follows a resource-based command structure:
 
 ```sh
-flora [resource] <command> [flags...]
+flora [OPTIONS] <resource> <command> [flags...]
 ```
 
 ```sh
-flora workspaces list \
-  --api-key 'My API Key'
+flora workspaces list --api-key 'My API Key'
 ```
 
 For details about specific commands, use the `--help` flag.
@@ -58,72 +41,59 @@ For details about specific commands, use the `--help` flag.
 
 ### Global flags
 
-- `--api-key` (can also be set with `FLORA_API_KEY` env var)
-- `--help` - Show command line usage
-- `--debug` - Enable debug logging (includes HTTP request/response details)
-- `--version`, `-v` - Show the CLI version
-- `--base-url` - Use a custom API backend URL
-- `--format` - Change the output format (`auto`, `explore`, `json`, `jsonl`, `pretty`, `raw`, `yaml`)
-- `--format-error` - Change the output format for errors (`auto`, `explore`, `json`, `jsonl`, `pretty`, `raw`, `yaml`)
-- `--transform` - Transform the data output using [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md)
-- `--transform-error` - Transform the error output using [GJSON syntax](https://github.com/tidwall/gjson/blob/master/SYNTAX.md)
+- `--api-key` — Flora API key (or set `FLORA_API_KEY`)
+- `--base-url` — Override the base URL for API requests
+- `--debug` — Enable debug logging
+- `--format` — Output format: `pretty` (default), `raw`
+- `--help` — Show command usage
+- `--version` — Show the CLI version
 
-### Passing files as arguments
+### Resources
 
-To pass files to your API, you can use the `@myfile.ext` syntax:
+| Command | Subcommands |
+| --- | --- |
+| `workspaces` | `list` |
+| `projects` | `create`, `retrieve`, `list`, `list-nodes` |
+| `projects:canvas` | `retrieve`, `update` |
+| `projects:actions` | `create`, `run` |
+| `projects:assets` | `attach` |
+| `techniques` | `retrieve`, `list` |
+| `technique-runs` | `create`, `retrieve` |
+| `assets` | `create`, `retrieve`, `list`, `complete`, `retry` |
+| `models` | `list` |
+| `runs` | `start-generation`, `start-technique` |
+| `generations` | `create` |
+| `feedback` | `record` |
+| `actions` | `list`, `get` |
 
-```bash
-flora <command> --arg @abe.jpg
+### Examples
+
+```sh
+# List workspaces
+flora workspaces list
+
+# Create a project
+flora projects create --workspace-id ws_abc123 --name "My Project"
+
+# List techniques with search
+flora techniques list --workspace-id ws_abc123 --query "upscale"
+
+# Start a generation
+flora generations create \
+  --type image \
+  --prompt "A sunset over mountains" \
+  --workspace-id ws_abc123 \
+  --project-id prj_abc123
+
+# Get canvas for a project
+flora projects:canvas retrieve prj_abc123
 ```
 
-Files can also be passed inside JSON or YAML blobs:
+## Development
 
-```bash
-flora <command> --arg '{image: "@abe.jpg"}'
-# Equivalent:
-flora <command> <<YAML
-arg:
-  image: "@abe.jpg"
-YAML
+```sh
+pnpm install       # install dependencies
+pnpm dev           # run via tsx (no build needed)
+pnpm build         # compile to dist/
+pnpm typecheck     # type-check without emitting
 ```
-
-If you need to pass a string literal that begins with an `@` sign, you can
-escape the `@` sign to avoid accidentally passing a file.
-
-```bash
-flora <command> --username '\@abe'
-```
-
-#### Explicit encoding
-
-For JSON endpoints, the CLI tool does filetype sniffing to determine whether the
-file contents should be sent as a string literal (for plain text files) or as a
-base64-encoded string literal (for binary files). If you need to explicitly send
-the file as either plain text or base64-encoded data, you can use
-`@file://myfile.txt` (for string encoding) or `@data://myfile.dat` (for
-base64-encoding). Note that absolute paths will begin with `@file://` or
-`@data://`, followed by a third `/` (for example, `@file:///tmp/file.txt`).
-
-```bash
-flora <command> --arg @data://file.txt
-```
-
-## Linking different Go SDK versions
-
-You can link the CLI against a different version of the Flora Go SDK
-for development purposes using the `./scripts/link` script.
-
-To link to a specific version from a repository (version can be a branch,
-git tag, or commit hash):
-
-```bash
-./scripts/link github.com/org/repo@version
-```
-
-To link to a local copy of the SDK:
-
-```bash
-./scripts/link ../path/to/flora-go
-```
-
-If you run the link script without any arguments, it will default to `../flora-go`.
