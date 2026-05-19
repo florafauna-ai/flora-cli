@@ -5,6 +5,9 @@ import {
   handleError,
   parseJsonArg,
   printResult,
+  pollRun,
+  downloadOutputs,
+  pollArgs,
   type GlobalArgs,
 } from "../client.js";
 
@@ -20,12 +23,13 @@ const startGeneration = defineCommand({
     "project-id": { type: "string", description: "Project identifier", required: true },
     model: { type: "string", description: "Model identifier" },
     params: { type: "string", description: "Model parameters as JSON" },
+    ...pollArgs,
   },
-  run({ args }) {
+  async run({ args }) {
     const global = args as unknown as GlobalArgs;
     const client = getClient(global);
-    return client.runs
-      .startGeneration({
+    try {
+      const res = await client.runs.startGeneration({
         type: args.type as RunStartGenerationParams["type"],
         prompt: args.prompt,
         workspace_id: args["workspace-id"],
@@ -34,9 +38,30 @@ const startGeneration = defineCommand({
         ...(args.params
           ? { params: parseJsonArg(args.params, "params") as Record<string, unknown> }
           : {}),
-      })
-      .then((res) => printResult(res, global))
-      .catch(handleError);
+      });
+
+      printResult(res, global);
+
+      const shouldPoll = global.poll || global.download;
+      if (shouldPoll) {
+        const runId = res.run_id;
+        const pollUrl = res.poll_url ?? undefined;
+        console.error(`\nPolling run ${runId}...`);
+        const status = await pollRun(runId, global, pollUrl);
+        printResult(status, global);
+
+        if (status.status === "failed") {
+          console.error(`Run failed: ${status.error_message ?? status.error_code ?? "unknown"}`);
+          process.exit(1);
+        }
+
+        if (global.download) {
+          await downloadOutputs(status, global);
+        }
+      }
+    } catch (err) {
+      handleError(err);
+    }
   },
 });
 
@@ -71,19 +96,41 @@ const startTechnique = defineCommand({
     "technique-id": { type: "string", description: "Technique identifier", required: true },
     "workspace-id": { type: "string", description: "Workspace identifier", required: true },
     inputs: { type: "string", description: "Run inputs as JSON", required: true },
+    ...pollArgs,
   },
-  run({ args }) {
+  async run({ args }) {
     const global = args as unknown as GlobalArgs;
     const client = getClient(global);
     const inputs = parseJsonArg(args.inputs, "inputs");
-    return client.runs
-      .startTechnique({
+    try {
+      const res = await client.runs.startTechnique({
         technique_id: args["technique-id"],
         workspace_id: args["workspace-id"],
         inputs,
-      })
-      .then((res) => printResult(res, global))
-      .catch(handleError);
+      });
+
+      printResult(res, global);
+
+      const shouldPoll = global.poll || global.download;
+      if (shouldPoll) {
+        const runId = res.run_id;
+        const pollUrl = res.poll_url ?? undefined;
+        console.error(`\nPolling run ${runId}...`);
+        const status = await pollRun(runId, global, pollUrl);
+        printResult(status, global);
+
+        if (status.status === "failed") {
+          console.error(`Run failed: ${status.error_message ?? status.error_code ?? "unknown"}`);
+          process.exit(1);
+        }
+
+        if (global.download) {
+          await downloadOutputs(status, global);
+        }
+      }
+    } catch (err) {
+      handleError(err);
+    }
   },
 });
 
