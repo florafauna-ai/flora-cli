@@ -1,6 +1,6 @@
-# Flora CLI
+# FLORA CLI
 
-The official CLI for the Flora REST API.
+The official CLI for the FLORA REST API.
 
 It is generated with [Stainless](https://www.stainless.com/).
 
@@ -114,7 +114,7 @@ flora <command> --arg @data://file.txt
 
 ## Linking different Go SDK versions
 
-You can link the CLI against a different version of the Flora Go SDK
+You can link the CLI against a different version of the FLORA Go SDK
 for development purposes using the `./scripts/link` script.
 
 To link to a specific version from a repository (version can be a branch,
