@@ -1,6 +1,8 @@
-# Flora CLI
+# FLORA CLI
 
 The official CLI for the Flora REST API, built with [citty](https://github.com/unjs/citty) and the [@flora-ai/flora](https://www.npmjs.com/package/@flora-ai/flora) TypeScript SDK.
+
+<!-- x-release-please-start-version -->
 
 ## Installation
 
@@ -9,6 +11,8 @@ Requires Node.js 18+.
 ```sh
 npm install -g @flora-ai/cli
 ```
+
+<!-- x-release-please-end -->
 
 ### Running Locally
 
