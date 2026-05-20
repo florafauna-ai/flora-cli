@@ -5,7 +5,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/mocktest"
+	"github.com/florafauna-ai/flora-cli/internal/mocktest"
 )
 
 func TestProjectsAssetsAttachAsset(t *testing.T) {

@@ -6,62 +6,59 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/florafauna-ai/flora-cli/internal/apiquery"
+	"github.com/florafauna-ai/flora-cli/internal/requestflag"
 	"github.com/florafauna-ai/flora-go"
 	"github.com/florafauna-ai/flora-go/option"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/apiquery"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
 )
 
-var feedbackRecord = cli.Command{
-	Name:    "record",
-	Usage:   "Records product feedback from the authenticated user, optionally linked to a\nworkspace, project, run, and attempted tools. Mutating public API requests\nsupport an optional Idempotency-Key header for client retries; duplicate keys\nwithin two hours return idempotency_duplicate.",
+var generationsCreate = cli.Command{
+	Name:    "create",
+	Usage:   "Starts a model generation using a prompt, workspace, project, optional model,\nand optional model parameters. Poll the returned run_id via GET /runs/{runId}\nfor progress and outputs. Mutating public API requests support an optional\nIdempotency-Key header for client retries; duplicate keys within two hours\nreturn idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "detail",
-			Usage:    "Detailed description",
-			Required: true,
-			BodyPath: "detail",
-		},
-		&requestflag.Flag[string]{
-			Name:     "kind",
-			Usage:    "Feedback kind",
-			Required: true,
-			BodyPath: "kind",
-		},
-		&requestflag.Flag[string]{
-			Name:     "summary",
-			Usage:    "Short summary",
-			Required: true,
-			BodyPath: "summary",
-		},
-		&requestflag.Flag[[]string]{
-			Name:     "attempted-tool",
-			BodyPath: "attempted_tools",
-		},
-		&requestflag.Flag[string]{
 			Name:     "project-id",
 			Usage:    "Project identifier",
+			Required: true,
 			BodyPath: "project_id",
 		},
 		&requestflag.Flag[string]{
-			Name:     "run-id",
-			Usage:    "Run identifier",
-			BodyPath: "run_id",
+			Name:     "prompt",
+			Usage:    "Generation prompt",
+			Required: true,
+			BodyPath: "prompt",
+		},
+		&requestflag.Flag[string]{
+			Name:     "type",
+			Usage:    "Generation type",
+			Required: true,
+			BodyPath: "type",
 		},
 		&requestflag.Flag[string]{
 			Name:     "workspace-id",
 			Usage:    "Workspace identifier",
+			Required: true,
 			BodyPath: "workspace_id",
 		},
+		&requestflag.Flag[string]{
+			Name:     "model",
+			Usage:    "Model endpoint ID",
+			BodyPath: "model",
+		},
+		&requestflag.Flag[map[string]any]{
+			Name:     "params",
+			Usage:    "Model parameters",
+			BodyPath: "params",
+		},
 	},
-	Action:          handleFeedbackRecord,
+	Action:          handleGenerationsCreate,
 	HideHelpCommand: true,
 }
 
-func handleFeedbackRecord(ctx context.Context, cmd *cli.Command) error {
+func handleGenerationsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
 
@@ -80,11 +77,11 @@ func handleFeedbackRecord(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := flora.FeedbackRecordParams{}
+	params := flora.GenerationNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Feedback.Record(ctx, params, options...)
+	_, err = client.Generations.New(ctx, params, options...)
 	if err != nil {
 		return err
 	}
@@ -97,7 +94,7 @@ func handleFeedbackRecord(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "feedback record",
+		Title:          "generations create",
 		Transform:      transform,
 	})
 }

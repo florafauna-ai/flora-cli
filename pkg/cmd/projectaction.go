@@ -14,82 +14,62 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var runsStartGeneration = cli.Command{
-	Name:    "start-generation",
-	Usage:   "Starts a model generation run in a project canvas using a prompt, workspace,\nproject, optional model, and optional model parameters. Mutating public API\nrequests support an optional Idempotency-Key header for client retries;\nduplicate keys within two hours return idempotency_duplicate.",
+var projectsActionsCreate = cli.Command{
+	Name:    "create",
+	Usage:   "Creates a prebuilt action node on a project canvas using a raw action slug.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
-			Name:     "project-id",
-			Usage:    "Project identifier",
-			Required: true,
-			BodyPath: "project_id",
+			Name:      "project-id",
+			Usage:     "Project identifier",
+			Required:  true,
+			PathParam: "projectId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "prompt",
-			Usage:    "Generation prompt",
+			Name:     "action-id",
+			Usage:    "Action identifier",
 			Required: true,
-			BodyPath: "prompt",
-		},
-		&requestflag.Flag[string]{
-			Name:     "type",
-			Usage:    "Generation type",
-			Required: true,
-			BodyPath: "type",
-		},
-		&requestflag.Flag[string]{
-			Name:     "workspace-id",
-			Usage:    "Workspace identifier",
-			Required: true,
-			BodyPath: "workspace_id",
-		},
-		&requestflag.Flag[string]{
-			Name:     "model",
-			Usage:    "Model endpoint ID",
-			BodyPath: "model",
+			BodyPath: "action_id",
 		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "params",
-			Usage:    "Model parameters",
+			Usage:    "Action parameters",
 			BodyPath: "params",
 		},
 	},
-	Action:          handleRunsStartGeneration,
+	Action:          handleProjectsActionsCreate,
 	HideHelpCommand: true,
 }
 
-var runsStartTechnique = cli.Command{
-	Name:    "start-technique",
-	Usage:   "Starts a technique run through the normalized top-level run resource. Mutating\npublic API requests support an optional Idempotency-Key header for client\nretries; duplicate keys within two hours return idempotency_duplicate.",
+var projectsActionsRun = cli.Command{
+	Name:    "run",
+	Usage:   "Runs an existing canvas action node through the action execution workflow.",
 	Suggest: true,
 	Flags: []cli.Flag{
-		&requestflag.Flag[map[string]any]{
-			Name:     "inputs",
-			Usage:    "Technique inputs",
-			Required: true,
-			BodyPath: "inputs",
+		&requestflag.Flag[string]{
+			Name:      "project-id",
+			Usage:     "Project identifier",
+			Required:  true,
+			PathParam: "projectId",
 		},
 		&requestflag.Flag[string]{
-			Name:     "technique-id",
-			Usage:    "Technique identifier",
-			Required: true,
-			BodyPath: "technique_id",
-		},
-		&requestflag.Flag[string]{
-			Name:     "workspace-id",
-			Usage:    "Workspace identifier",
-			Required: true,
-			BodyPath: "workspace_id",
+			Name:      "node-id",
+			Usage:     "Canvas action node identifier",
+			Required:  true,
+			PathParam: "nodeId",
 		},
 	},
-	Action:          handleRunsStartTechnique,
+	Action:          handleProjectsActionsRun,
 	HideHelpCommand: true,
 }
 
-func handleRunsStartGeneration(ctx context.Context, cmd *cli.Command) error {
+func handleProjectsActionsCreate(ctx context.Context, cmd *cli.Command) error {
 	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-
+	if !cmd.IsSet("project-id") && len(unusedArgs) > 0 {
+		cmd.Set("project-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
@@ -105,11 +85,16 @@ func handleRunsStartGeneration(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	params := flora.RunStartGenerationParams{}
+	params := flora.ProjectActionNewParams{}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Runs.StartGeneration(ctx, params, options...)
+	_, err = client.Projects.Actions.New(
+		ctx,
+		cmd.Value("project-id").(string),
+		params,
+		options...,
+	)
 	if err != nil {
 		return err
 	}
@@ -122,15 +107,18 @@ func handleRunsStartGeneration(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "runs start-generation",
+		Title:          "projects:actions create",
 		Transform:      transform,
 	})
 }
 
-func handleRunsStartTechnique(ctx context.Context, cmd *cli.Command) error {
+func handleProjectsActionsRun(ctx context.Context, cmd *cli.Command) error {
 	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
 	unusedArgs := cmd.Args().Slice()
-
+	if !cmd.IsSet("node-id") && len(unusedArgs) > 0 {
+		cmd.Set("node-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
 	if len(unusedArgs) > 0 {
 		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
 	}
@@ -139,18 +127,25 @@ func handleRunsStartTechnique(ctx context.Context, cmd *cli.Command) error {
 		cmd,
 		apiquery.NestedQueryFormatBrackets,
 		apiquery.ArrayQueryFormatComma,
-		ApplicationJSON,
+		EmptyBody,
 		false,
 	)
 	if err != nil {
 		return err
 	}
 
-	params := flora.RunStartTechniqueParams{}
+	params := flora.ProjectActionRunParams{
+		ProjectID: cmd.Value("project-id").(string),
+	}
 
 	var res []byte
 	options = append(options, option.WithResponseBodyInto(&res))
-	_, err = client.Runs.StartTechnique(ctx, params, options...)
+	_, err = client.Projects.Actions.Run(
+		ctx,
+		cmd.Value("node-id").(string),
+		params,
+		options...,
+	)
 	if err != nil {
 		return err
 	}
@@ -163,7 +158,7 @@ func handleRunsStartTechnique(ctx context.Context, cmd *cli.Command) error {
 		ExplicitFormat: explicitFormat,
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
-		Title:          "runs start-technique",
+		Title:          "projects:actions run",
 		Transform:      transform,
 	})
 }

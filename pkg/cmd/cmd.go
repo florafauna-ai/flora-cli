@@ -12,8 +12,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/autocomplete"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
+	"github.com/florafauna-ai/flora-cli/internal/autocomplete"
+	"github.com/florafauna-ai/flora-cli/internal/requestflag"
 	docs "github.com/urfave/cli-docs/v3"
 	"github.com/urfave/cli/v3"
 )
@@ -142,6 +142,24 @@ func init() {
 				},
 			},
 			{
+				Name:     "projects:canvas",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&projectsCanvasRetrieve,
+					&projectsCanvasUpdate,
+				},
+			},
+			{
+				Name:     "projects:actions",
+				Category: "API RESOURCE",
+				Suggest:  true,
+				Commands: []*cli.Command{
+					&projectsActionsCreate,
+					&projectsActionsRun,
+				},
+			},
+			{
 				Name:     "models",
 				Category: "API RESOURCE",
 				Suggest:  true,
@@ -159,11 +177,11 @@ func init() {
 				},
 			},
 			{
-				Name:     "feedback",
+				Name:     "generations",
 				Category: "API RESOURCE",
 				Suggest:  true,
 				Commands: []*cli.Command{
-					&feedbackRecord,
+					&generationsCreate,
 				},
 			},
 			{

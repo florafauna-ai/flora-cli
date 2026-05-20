@@ -5,8 +5,8 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/mocktest"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
+	"github.com/florafauna-ai/flora-cli/internal/mocktest"
+	"github.com/florafauna-ai/flora-cli/internal/requestflag"
 )
 
 func TestTechniquesRunsCreate(t *testing.T) {
@@ -16,8 +16,8 @@ func TestTechniquesRunsCreate(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques:runs", "create",
-			"--technique-id", "tech_def_abc123",
-			"--input", "{id: id, type: imageUrl, value: value}",
+			"--technique-id", "art-directors-critique",
+			"--input", "{id: id, type: text, value: value}",
 			"--mode", "async",
 			"--callback-url", "https://example.com",
 			"--idempotency-key", "idempotency_key",
@@ -33,9 +33,9 @@ func TestTechniquesRunsCreate(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques:runs", "create",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 			"--input.id", "id",
-			"--input.type", "imageUrl",
+			"--input.type", "text",
 			"--input.value", "value",
 			"--mode", "async",
 			"--callback-url", "https://example.com",
@@ -48,7 +48,7 @@ func TestTechniquesRunsCreate(t *testing.T) {
 		pipeData := []byte("" +
 			"inputs:\n" +
 			"  - id: id\n" +
-			"    type: imageUrl\n" +
+			"    type: text\n" +
 			"    value: value\n" +
 			"mode: async\n" +
 			"callback_url: https://example.com\n" +
@@ -57,7 +57,7 @@ func TestTechniquesRunsCreate(t *testing.T) {
 			t, pipeData,
 			"--api-key", "string",
 			"techniques:runs", "create",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 		)
 	})
 }
@@ -69,7 +69,7 @@ func TestTechniquesRunsRetrieve(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques:runs", "retrieve",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 			"--run-id", "run_abc123",
 		)
 	})

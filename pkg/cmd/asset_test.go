@@ -5,7 +5,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/mocktest"
+	"github.com/florafauna-ai/flora-cli/internal/mocktest"
 )
 
 func TestAssetsCreate(t *testing.T) {
@@ -59,7 +59,7 @@ func TestAssetsList(t *testing.T) {
 			"--api-key", "string",
 			"assets", "list",
 			"--max-items", "10",
-			"--cursor", "cursor",
+			"--cursor", "eyJvZmZzZXQiOjIwfQ",
 			"--limit", "1",
 			"--project-id", "prj_abc123",
 			"--query", "logo",

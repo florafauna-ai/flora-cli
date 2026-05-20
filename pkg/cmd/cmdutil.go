@@ -16,8 +16,8 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/florafauna-ai/flora-cli/internal/jsonview"
 	"github.com/florafauna-ai/flora-go/option"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/jsonview"
 
 	"github.com/charmbracelet/x/term"
 	"github.com/itchyny/json2yaml"
@@ -40,7 +40,7 @@ func ValidateBaseURL(value, source string) error {
 
 func getDefaultRequestOptions(cmd *cli.Command) []option.RequestOption {
 	opts := []option.RequestOption{
-		option.WithHeader("User-Agent", fmt.Sprintf("Flora/CLI %s", Version)),
+		option.WithHeader("User-Agent", fmt.Sprintf("FLORA/CLI %s", Version)),
 		option.WithHeader("X-Stainless-Lang", "cli"),
 		option.WithHeader("X-Stainless-Package-Version", Version),
 		option.WithHeader("X-Stainless-Runtime", "cli"),

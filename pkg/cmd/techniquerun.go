@@ -6,10 +6,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/florafauna-ai/flora-cli/internal/apiquery"
+	"github.com/florafauna-ai/flora-cli/internal/requestflag"
 	"github.com/florafauna-ai/flora-go"
 	"github.com/florafauna-ai/flora-go/option"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/apiquery"
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/requestflag"
 	"github.com/tidwall/gjson"
 	"github.com/urfave/cli/v3"
 )
@@ -27,17 +27,19 @@ var techniquesRunsCreate = requestflag.WithInnerFlags(cli.Command{
 		},
 		&requestflag.Flag[[]map[string]any]{
 			Name:     "input",
+			Usage:    "Technique inputs",
 			Required: true,
 			BodyPath: "inputs",
 		},
 		&requestflag.Flag[string]{
 			Name:     "mode",
-			Usage:    `Allowed values: "async", "stream".`,
+			Usage:    "Technique run execution mode",
 			Required: true,
 			BodyPath: "mode",
 		},
 		&requestflag.Flag[string]{
 			Name:     "callback-url",
+			Usage:    "HTTPS callback URL for asynchronous run completion notifications",
 			BodyPath: "callback_url",
 		},
 		&requestflag.Flag[string]{

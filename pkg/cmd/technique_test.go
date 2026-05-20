@@ -5,7 +5,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/stainless-sdks/florafauna-ai-cli/internal/mocktest"
+	"github.com/florafauna-ai/flora-cli/internal/mocktest"
 )
 
 func TestTechniquesRetrieve(t *testing.T) {
@@ -15,7 +15,7 @@ func TestTechniquesRetrieve(t *testing.T) {
 			t,
 			"--api-key", "string",
 			"techniques", "retrieve",
-			"--technique-id", "tech_def_abc123",
+			"--technique-id", "art-directors-critique",
 		)
 	})
 }
@@ -28,7 +28,7 @@ func TestTechniquesList(t *testing.T) {
 			"--api-key", "string",
 			"techniques", "list",
 			"--max-items", "10",
-			"--cursor", "cursor",
+			"--cursor", "eyJvZmZzZXQiOjIwfQ",
 			"--limit", "1",
 			"--query", "logo",
 			"--workspace-id", "ws_abc123",

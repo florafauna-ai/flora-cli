@@ -1,8 +1,10 @@
-# Flora CLI
+# FLORA CLI
 
-The official CLI for the Flora REST API.
+The official CLI for the FLORA REST API.
 
 It is generated with [Stainless](https://www.stainless.com/).
+
+<!-- x-release-please-start-version -->
 
 ## Installation
 
@@ -11,7 +13,7 @@ It is generated with [Stainless](https://www.stainless.com/).
 To test or install the CLI locally, you need [Go](https://go.dev/doc/install) version 1.22 or later installed.
 
 ```sh
-go install 'github.com/stainless-sdks/florafauna-ai-cli/cmd/flora@latest'
+go install 'github.com/florafauna-ai/flora-cli/cmd/flora@latest'
 ```
 
 Once you have run `go install`, the binary is placed in your Go bin directory:
@@ -25,6 +27,8 @@ If commands aren't found after installation, add the Go bin directory to your PA
 # Add to your shell profile (.zshrc, .bashrc, etc.)
 export PATH="$PATH:$(go env GOPATH)/bin"
 ```
+
+<!-- x-release-please-end -->
 
 ### Running Locally
 
@@ -110,7 +114,7 @@ flora <command> --arg @data://file.txt
 
 ## Linking different Go SDK versions
 
-You can link the CLI against a different version of the Flora Go SDK
+You can link the CLI against a different version of the FLORA Go SDK
 for development purposes using the `./scripts/link` script.
 
 To link to a specific version from a repository (version can be a branch,
