@@ -100,6 +100,7 @@ func init() {
 				Commands: []*cli.Command{
 					&techniquesRunsCreate,
 					&techniquesRunsRetrieve,
+					&techniquesRunsList,
 				},
 			},
 			{
@@ -182,6 +183,7 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&generationsCreate,
+					&generationsList,
 				},
 			},
 			{

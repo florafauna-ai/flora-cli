@@ -74,3 +74,21 @@ func TestTechniquesRunsRetrieve(t *testing.T) {
 		)
 	})
 }
+
+func TestTechniquesRunsList(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"techniques:runs", "list",
+			"--max-items", "10",
+			"--cursor", "eyJvZmZzZXQiOjIwfQ",
+			"--limit", "1",
+			"--project-id", "prj_abc123",
+			"--status", "pending",
+			"--technique-id", "tech_abcd1234",
+			"--workspace-id", "ws_abc123",
+		)
+	})
+}

@@ -16,18 +16,18 @@ import (
 
 var assetsCreate = cli.Command{
 	Name:    "create",
-	Usage:   "Creates an asset from an allowlisted source URL or reserves a signed upload URL.\nMutating public API requests support an optional Idempotency-Key header for\nclient retries; duplicate keys within two hours return idempotency_duplicate.",
+	Usage:   "Creates an asset from a source string. Pass source=\"signed-url\" to reserve a\ndirect upload URL, or pass an allowlisted HTTPS URL for server-side fetch.\nMutating public API requests support an optional Idempotency-Key header for\nclient retries; duplicate keys within two hours return idempotency_duplicate.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
 			Name:     "source",
-			Usage:    "Asset source URL or signed-url upload mode",
+			Usage:    `Asset source as a string: either "signed-url" to reserve a direct upload URL, or an allowlisted HTTPS URL for server-side fetch.`,
 			Required: true,
 			BodyPath: "source",
 		},
 		&requestflag.Flag[string]{
 			Name:     "workspace-id",
-			Usage:    "Workspace identifier",
+			Usage:    "Workspace identifier. Use the public API ID returned by list workspaces; it must start with ws_.",
 			Required: true,
 			BodyPath: "workspace_id",
 		},

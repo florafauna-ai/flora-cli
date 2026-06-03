@@ -32,7 +32,7 @@ var projectsCanvasRetrieve = cli.Command{
 
 var projectsCanvasUpdate = cli.Command{
 	Name:    "update",
-	Usage:   "Applies a Mermaid flowchart patch to the project canvas using the same\ncreate_workflow path as the Fauna agent. The diagram may add nodes, connect\nnodes, and reference existing canvas nodes by their Mermaid short IDs.",
+	Usage:   "Applies a Mermaid flowchart patch to the project canvas using the same\ncreate_workflow path as the Fauna agent. The diagram may add nodes, connect\nnodes, and reference existing canvas nodes by their Mermaid short IDs in edges\n(e.g. `n1 --> out`). This endpoint is add-only: re-declaring an existing node id\nwith a label (e.g. `n3[\"...\"]`) creates a NEW node instead of updating the\nexisting one, and returns a warning. To attach to an existing node, reference\nits id in an edge without re-declaring its label. Subgraph grouping is not\napplied (nodes inside a `subgraph` are added ungrouped) and returns a warning.\nTo place an existing image/video/audio as a static node, set `node_params` —\nwhich is keyed by Mermaid node id, e.g.\n`{ \"img1\": { \"content_url\": \"https://…\" } }`, NOT a bare `{ content_url }`\nobject. `prompt` and `content_url` are mutually exclusive for a node: use\n`prompt` (or a label that doubles as the prompt) for generation, or\n`content_url` for existing media. When using `content_url`, give the node a\ncontent-free type-only label such as `img1[\"(Image)\"]` so no prompt is inferred\nfrom the label.",
 	Suggest: true,
 	Flags: []cli.Flag{
 		&requestflag.Flag[string]{
@@ -49,7 +49,7 @@ var projectsCanvasUpdate = cli.Command{
 		},
 		&requestflag.Flag[map[string]any]{
 			Name:     "node-params",
-			Usage:    "Optional per-node parameters keyed by Mermaid node ID.",
+			Usage:    `Optional per-node parameters, keyed by Mermaid node id (a Record<nodeId, NodeParams>), e.g. { "img1": { "content_url": "https://…" } }. Pass a map keyed by node id, NOT a bare { content_url } object.`,
 			BodyPath: "node_params",
 		},
 	},
