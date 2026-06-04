@@ -58,6 +58,22 @@ var generationsCreate = cli.Command{
 	HideHelpCommand: true,
 }
 
+var generationsRetrieve = cli.Command{
+	Name:    "retrieve",
+	Usage:   "Returns status and completed output URLs for a public API run, including action\nruns started through POST /runs/action.",
+	Suggest: true,
+	Flags: []cli.Flag{
+		&requestflag.Flag[string]{
+			Name:      "run-id",
+			Usage:     "Run identifier",
+			Required:  true,
+			PathParam: "runId",
+		},
+	},
+	Action:          handleGenerationsRetrieve,
+	HideHelpCommand: true,
+}
+
 var generationsList = cli.Command{
 	Name:    "list",
 	Usage:   "Lists generation history for the authenticated caller, including pending,\nrunning, completed, and failed generations. Results are newest first and can be\nfiltered by workspace_id, project_id, and status. Each item includes poll_url;\nuse it to poll pending/running generations and to fetch completed or failed run\ndetails and outputs.",
@@ -134,6 +150,48 @@ func handleGenerationsCreate(ctx context.Context, cmd *cli.Command) error {
 		Format:         format,
 		RawOutput:      cmd.Root().Bool("raw-output"),
 		Title:          "generations create",
+		Transform:      transform,
+	})
+}
+
+func handleGenerationsRetrieve(ctx context.Context, cmd *cli.Command) error {
+	client := flora.NewClient(getDefaultRequestOptions(cmd)...)
+	unusedArgs := cmd.Args().Slice()
+	if !cmd.IsSet("run-id") && len(unusedArgs) > 0 {
+		cmd.Set("run-id", unusedArgs[0])
+		unusedArgs = unusedArgs[1:]
+	}
+	if len(unusedArgs) > 0 {
+		return fmt.Errorf("Unexpected extra arguments: %v", unusedArgs)
+	}
+
+	options, err := flagOptions(
+		cmd,
+		apiquery.NestedQueryFormatBrackets,
+		apiquery.ArrayQueryFormatComma,
+		EmptyBody,
+		false,
+	)
+	if err != nil {
+		return err
+	}
+
+	var res []byte
+	options = append(options, option.WithResponseBodyInto(&res))
+	_, err = client.Generations.Get(ctx, cmd.Value("run-id").(string), options...)
+	if err != nil {
+		return err
+	}
+
+	obj := gjson.ParseBytes(res)
+	format := cmd.Root().String("format")
+	explicitFormat := cmd.Root().IsSet("format")
+	transform := cmd.Root().String("transform")
+	return ShowJSON(obj, ShowJSONOpts{
+		ExplicitFormat: explicitFormat,
+		Format:         format,
+		RawOutput:      cmd.Root().Bool("raw-output"),
+		Title:          "generations retrieve",
 		Transform:      transform,
 	})
 }

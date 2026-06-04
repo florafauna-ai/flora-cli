@@ -183,6 +183,7 @@ func init() {
 				Suggest:  true,
 				Commands: []*cli.Command{
 					&generationsCreate,
+					&generationsRetrieve,
 					&generationsList,
 				},
 			},

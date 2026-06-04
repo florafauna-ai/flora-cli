@@ -42,6 +42,18 @@ func TestGenerationsCreate(t *testing.T) {
 	})
 }
 
+func TestGenerationsRetrieve(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	t.Run("regular flags", func(t *testing.T) {
+		mocktest.TestRunMockTestWithFlags(
+			t,
+			"--api-key", "string",
+			"generations", "retrieve",
+			"--run-id", "run_abc123",
+		)
+	})
+}
+
 func TestGenerationsList(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	t.Run("regular flags", func(t *testing.T) {
